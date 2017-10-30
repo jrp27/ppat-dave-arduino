@@ -2,7 +2,6 @@
 #include "SendIR.h"
 
 SendIR::SendIR() {
-	IRSend irsend(4);
 	irsend.begin();
  	Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
 }
