@@ -165,8 +165,13 @@ int power(String command) {
 
   // TALK TO TV
   Serial.println("I am a power button look at me powering");
-  Serial.println(command);
-
+  for (int x = 0; x < 20; x++){
+    decreaseVolume("");
+  }
+  for (int x = 0; x < command.toInt(); x++){
+    increaseVolume("");
+    Serial.println(x);
+  }
   // sendIR.sendPower();
   return 1;
 }
