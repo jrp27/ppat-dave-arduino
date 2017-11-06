@@ -1,13 +1,15 @@
 #include <ESP8266WiFi.h>
 #include <aREST.h>
-
-//#define LIGHTWEIGHT 1
+//#include <SendIR.h>
 
 // Creates aREST instance
 aREST rest = aREST();
 
+// Creates SendIR instance
+//SendIR sendIR = SendIR();
+
 // WiFi params
-const char* ssid = "MIT GUEST";
+const char* ssid = "StataEECS";//"MIT GUEST";
 const char* password = "";
 
 // The port to listen for incoming TCP conections
@@ -32,7 +34,7 @@ void setup() {
   rest.function("volume/down", decreaseVolume);
 
   // Channel
-  rest.function("channel/set", setChannel);
+  rest.function("channel", setChannel);
   rest.function("channel/up", increaseChannel);
   rest.function("channel/down", increaseChannel);
 
@@ -81,55 +83,43 @@ void loop() {
 // Increases volume
 int increaseVolume(String command){
 
-  // Gets the value from command
-  int volume = command.toInt();
-
   // TALK TO TV
-  
+  // sendIR.sendVolumeUp();
   return 1;
 }
 
 // Decreases volume
 int decreaseVolume(String command){
 
-  // Gets the value from command
-  int volume = command.toInt();
-
   // TALK TO TV
-  
+  // sendIR.sendVolumeDown();
   return 1;
 }
 
 // Sets the channel to a specific channel
 int setChannel(String command) {
-  
-  // Gets the value from command
-  int channel = command.toInt();
 
+  Serial.println(command);
   // TALK TO TV
-  
+  for (int x = 0; x < command.length(); x++){
+    Serial.println(command[x]);
+  }
   return 1;
 }
 
 // Scrolls up in channel
 int increaseChannel(String command) {
 
-  // Gets the value from command
-  int displacement = command.toInt();
-
   // TALK TO TV
-
+  // sendIR.sendChannelUp();
   return 1;
 }
 
 // Scrolls down in channel
 int decreaseChannel(String command) {
 
-  // Gets the value from command
-  int displacement = command.toInt();
-
   // TALK TO TV
-
+  // sendIR.sendChannelDown();
   return 1;
 }
 
@@ -137,7 +127,10 @@ int decreaseChannel(String command) {
 int power(String command) {
 
   // TALK TO TV
+  Serial.println("I am a power button look at me powering");
+  Serial.println(command);
 
+  // sendIR.sendPower();
   return 1;
 }
 
