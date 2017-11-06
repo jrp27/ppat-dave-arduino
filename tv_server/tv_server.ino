@@ -30,13 +30,13 @@ void setup() {
   // Sets the API routes
 
   // Volume
-  rest.function("volume/up", increaseVolume);
-  rest.function("volume/down", decreaseVolume);
+  rest.function("volumeup", increaseVolume);
+  rest.function("volumedown", decreaseVolume);
 
   // Channel
   rest.function("channel", setChannel);
-  rest.function("channel/up", increaseChannel);
-  rest.function("channel/down", increaseChannel);
+  rest.function("channelup", increaseChannel);
+  rest.function("channeldown", increaseChannel);
 
   // Power
   rest.function("power", power);
@@ -85,6 +85,7 @@ int increaseVolume(String command){
 
   // TALK TO TV
   // sendIR.sendVolumeUp();
+  Serial.println("Increase volume");
   return 1;
 }
 
@@ -93,6 +94,7 @@ int decreaseVolume(String command){
 
   // TALK TO TV
   // sendIR.sendVolumeDown();
+  Serial.println("Decrease volume");
   return 1;
 }
 
@@ -102,7 +104,40 @@ int setChannel(String command) {
   Serial.println(command);
   // TALK TO TV
   for (int x = 0; x < command.length(); x++){
-    Serial.println(command[x]);
+    switch(int (command[x])) {
+      case 0:
+        //sendIR.send0();
+        break;
+      case 1:
+        //sendIR.send1();
+        break;
+      case 2:
+        //sendIR.send2();
+        break;
+      case 3:
+        //sendIR.send3();
+        break;
+      case 4:
+        //sendIR.send4();
+        break;
+      case 5:
+        //sendIR.send5();
+        break;
+      case 6:
+        //sendIR.send6();
+        break;
+      case 7:
+        //sendIR.send7();
+        break;
+      case 8:
+        //sendIR.send8();
+        break;
+      case 9:
+        //sendIR.send9();
+        break;
+      default:
+        break;
+    }
   }
   return 1;
 }
@@ -112,6 +147,7 @@ int increaseChannel(String command) {
 
   // TALK TO TV
   // sendIR.sendChannelUp();
+  Serial.println("Increase channel");
   return 1;
 }
 
@@ -120,6 +156,7 @@ int decreaseChannel(String command) {
 
   // TALK TO TV
   // sendIR.sendChannelDown();
+  Serial.println("Decrease channel");
   return 1;
 }
 
