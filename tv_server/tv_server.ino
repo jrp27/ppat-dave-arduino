@@ -1,15 +1,15 @@
 #include <ESP8266WiFi.h>
 #include <aREST.h>
-//#include <SendIR.h>
+#include <SendIR.h>
 
 // Creates aREST instance
 aREST rest = aREST();
 
 // Creates SendIR instance
-//SendIR sendIR = SendIR();
+SendIR sendIR = SendIR();
 
 // WiFi params
-const char* ssid = "StataEECS";//"MIT GUEST";
+const char* ssid = "MIT";//"MIT GUEST";
 const char* password = "";
 
 // The port to listen for incoming TCP conections
@@ -84,8 +84,8 @@ void loop() {
 int increaseVolume(String command){
 
   // TALK TO TV
-  // sendIR.sendVolumeUp();
   Serial.println("Increase volume");
+  sendIR.sendVolumeUp();
   return 1;
 }
 
@@ -93,7 +93,7 @@ int increaseVolume(String command){
 int decreaseVolume(String command){
 
   // TALK TO TV
-  // sendIR.sendVolumeDown();
+  sendIR.sendVolumeDown();
   Serial.println("Decrease volume");
   return 1;
 }
@@ -106,34 +106,34 @@ int setChannel(String command) {
   for (int x = 0; x < command.length(); x++){
     switch(int (command[x])) {
       case 0:
-        //sendIR.send0();
+        sendIR.send0();
         break;
       case 1:
-        //sendIR.send1();
+        sendIR.send1();
         break;
       case 2:
-        //sendIR.send2();
+        sendIR.send2();
         break;
       case 3:
-        //sendIR.send3();
+        sendIR.send3();
         break;
       case 4:
-        //sendIR.send4();
+        sendIR.send4();
         break;
       case 5:
-        //sendIR.send5();
+        sendIR.send5();
         break;
       case 6:
-        //sendIR.send6();
+        sendIR.send6();
         break;
       case 7:
-        //sendIR.send7();
+        sendIR.send7();
         break;
       case 8:
-        //sendIR.send8();
+        sendIR.send8();
         break;
       case 9:
-        //sendIR.send9();
+        sendIR.send9();
         break;
       default:
         break;
@@ -146,7 +146,7 @@ int setChannel(String command) {
 int increaseChannel(String command) {
 
   // TALK TO TV
-  // sendIR.sendChannelUp();
+  sendIR.sendChannelUp();
   Serial.println("Increase channel");
   return 1;
 }
@@ -155,7 +155,7 @@ int increaseChannel(String command) {
 int decreaseChannel(String command) {
 
   // TALK TO TV
-  // sendIR.sendChannelDown();
+  sendIR.sendChannelDown();
   Serial.println("Decrease channel");
   return 1;
 }
@@ -165,6 +165,7 @@ int power(String command) {
 
   // TALK TO TV
   Serial.println("I am a power button look at me powering");
+  sendIR.sendPower();
   for (int x = 0; x < 20; x++){
     decreaseVolume("");
   }
@@ -172,7 +173,6 @@ int power(String command) {
     increaseVolume("");
     Serial.println(x);
   }
-  // sendIR.sendPower();
   return 1;
 }
 
