@@ -30,6 +30,7 @@ void setup() {
   // Sets the API routes
 
   // Volume
+  rest.function("volume", setVolume);
   rest.function("volumeup", increaseVolume);
   rest.function("volumedown", decreaseVolume);
 
@@ -78,6 +79,17 @@ void loop() {
     delay(1);
   }
   rest.handle(client);
+}
+
+// Sets volume
+int setVolume(String command) {
+  for (int x = 0; x < 20; x++){
+    decreaseVolume("");
+  }
+  for (int x = 0; x < command.toInt(); x++){
+    increaseVolume("");
+  }
+  return 1;
 }
 
 // Increases volume
@@ -165,12 +177,6 @@ int power(String command) {
   // TALK TO TV
   Serial.println("I am a power button look at me powering");
   sendIR.sendPower();
-  for (int x = 0; x < 20; x++){
-    decreaseVolume("");
-  }
-  for (int x = 0; x < command.toInt(); x++){
-    increaseVolume("");
-  }
   return 1;
 }
 
