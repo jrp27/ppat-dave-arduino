@@ -18,14 +18,11 @@ const char* password = "";
 // Create an instance of the server
 WiFiServer server(LISTEN_PORT);
 
+const int max_vol = 20;
+
 void setup() {
   Serial.begin(115200);
   delay(10);
-
-  // Sets up restful API stuff
-
-  //rest.set_id("123456");
-  //rest.set_name("esp8266");
 
   // Sets the API routes
 
@@ -83,11 +80,22 @@ void loop() {
 
 // Sets volume
 int setVolume(String command) {
-  for (int x = 0; x < 20; x++){
-    decreaseVolume("");
-  }
-  for (int x = 0; x < command.toInt(); x++){
-    increaseVolume("");
+
+  Serial.println("Setting volume");
+  Serial.println(command);
+  int index_bracket_1 = command.indexOf("[");
+  int index_bracket_2 = command.indexOf("]");
+  int index_comma = command.indexOf(",");
+  int initial_volume = command.substring(index_bracket_1+1,index_comma).toInt();
+  int new_volume = command.substring(index_comma+1,index_bracket_2).toInt();
+  if (initial_volume - new_volume < 0) {
+    for (int i = 0; i < (-initial_volume + new_volume); i++) {
+      increaseVolume("");
+    }
+  } else {
+    for (int i = 0; i < initial_volume - new_volume; i++) {
+      decreaseVolume("");
+    }
   }
   return 1;
 }
@@ -174,6 +182,12 @@ int decreaseChannel(String command) {
 // Powers button for TV
 int power(String command) {
 
+  for (int x = 0; x < max_vol; x++){
+    decreaseVolume("");
+  }
+  for (int x = 0; x < command.toInt(); x++){
+    increaseVolume("");
+  }
   // TALK TO TV
   Serial.println("I am a power button look at me powering");
   sendIR.sendPower();
