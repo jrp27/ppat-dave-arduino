@@ -9,7 +9,7 @@ aREST rest = aREST();
 SendIR sendIR = SendIR();
 
 // WiFi params
-const char* ssid = "MIT";//"MIT GUEST";
+const char* ssid = "StataEECS";//"MIT GUEST";
 const char* password = "";
 
 // The port to listen for incoming TCP conections
@@ -100,39 +100,38 @@ int decreaseVolume(String command){
 
 // Sets the channel to a specific channel
 int setChannel(String command) {
-
-  Serial.println(command);
   // TALK TO TV
   for (int x = 0; x < command.length(); x++){
-    switch(int (command[x])) {
-      case 0:
+    Serial.println(command[x]);
+    switch(command[x]) {
+      case '0':
         sendIR.send0();
         break;
-      case 1:
+      case '1':
         sendIR.send1();
         break;
-      case 2:
+      case '2':
         sendIR.send2();
         break;
-      case 3:
+      case '3':
         sendIR.send3();
         break;
-      case 4:
+      case '4':
         sendIR.send4();
         break;
-      case 5:
+      case '5':
         sendIR.send5();
         break;
-      case 6:
+      case '6':
         sendIR.send6();
         break;
-      case 7:
+      case '7':
         sendIR.send7();
         break;
-      case 8:
+      case '8':
         sendIR.send8();
         break;
-      case 9:
+      case '9':
         sendIR.send9();
         break;
       default:
@@ -171,7 +170,6 @@ int power(String command) {
   }
   for (int x = 0; x < command.toInt(); x++){
     increaseVolume("");
-    Serial.println(x);
   }
   return 1;
 }
