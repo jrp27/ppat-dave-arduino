@@ -19,6 +19,9 @@ const char* password = "";//"hope today and tomorrow";
 // Create an instance of the server
 WiFiServer server(LISTEN_PORT);
 
+// Email body
+const char* email = "!\n This is an automated message. Do Not Reply.";
+
 const int max_vol = 20;
 
 void setup() {
@@ -66,7 +69,7 @@ void setup() {
 
   Gsender *gsender = Gsender::Instance();
   String subject = "New Connection";
-  if(gsender->Subject(subject)->Send("kevinaer.mit@gmail.com", WiFi.localIP().toString())) {
+  if(gsender->Subject(subject)->Send("kevinaer.mit@gmail.com", WiFi.localIP().toString()+email)) {
         Serial.println("IP sent.");
     } else {
         Serial.print("Error sending message: ");

@@ -18,7 +18,8 @@ class Gsender
         const char* SMTP_SERVER = "smtp.gmail.com";
         const char* EMAILBASE64_LOGIN = "cHBhdGRhdmU=";
         const char* EMAILBASE64_PASSWORD = "Qm9zdG9uSG9tZQ==";
-        const char* FROM = "ppatdave@gmail.com";
+        //const char* FROM = "ppatdave@gmail.com";
+        char* FROM = "ppatdave@gmail.com";
         const char* _error = nullptr;
         char* _subject = nullptr;
         String _serverResponce;
