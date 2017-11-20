@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <aREST.h>
 #include <SendIR.h>
+#include "Gsender.h"
 
 // Creates aREST instance
 aREST rest = aREST();
@@ -9,8 +10,8 @@ aREST rest = aREST();
 SendIR sendIR = SendIR();
 
 // WiFi params
-const char* ssid = "TBH";
-const char* password = "hope today and tomorrow";
+const char* ssid = "StataEECS"; //"TBH";
+const char* password = "";//"hope today and tomorrow";
 
 // The port to listen for incoming TCP conections
 #define LISTEN_PORT 80
@@ -63,6 +64,15 @@ void setup() {
   Serial.print(WiFi.localIP());
   Serial.println("/");
 
+  Gsender *gsender = Gsender::Instance();
+  String subject = "New Connection";
+  if(gsender->Subject(subject)->Send("kevinaer.mit@gmail.com", WiFi.localIP().toString())) {
+        Serial.println("IP sent.");
+    } else {
+        Serial.print("Error sending message: ");
+        Serial.println(gsender->getError());
+    }
+
 }
 
 void loop() {
@@ -76,6 +86,10 @@ void loop() {
     delay(1);
   }
   rest.handle(client);
+}
+
+void error(char* err) {
+  Serial.println(err);
 }
 
 // Sets volume
