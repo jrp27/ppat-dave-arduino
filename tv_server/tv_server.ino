@@ -9,8 +9,8 @@ aREST rest = aREST();
 SendIR sendIR = SendIR();
 
 // WiFi params
-const char* ssid = "StataEECS";//"MIT GUEST";
-const char* password = "";
+const char* ssid = "TBH";
+const char* password = "hope today and tomorrow";
 
 // The port to listen for incoming TCP conections
 #define LISTEN_PORT 80
@@ -99,7 +99,6 @@ int setVolume(String command) {
   }
   return 1;
 }
-
 // Increases volume
 int increaseVolume(String command){
 
@@ -157,6 +156,7 @@ int setChannel(String command) {
       default:
         break;
     }
+    delay(250);
   }
   return 1;
 }
@@ -182,15 +182,20 @@ int decreaseChannel(String command) {
 // Powers button for TV
 int power(String command) {
 
-  for (int x = 0; x < max_vol; x++){
-    decreaseVolume("");
-  }
-  for (int x = 0; x < command.toInt(); x++){
-    increaseVolume("");
-  }
   // TALK TO TV
   Serial.println("I am a power button look at me powering");
   sendIR.sendPower();
+
+  delay(500);
+  
+  for (int x = 0; x < max_vol; x++){
+    decreaseVolume("");
+    delay(100);
+  }
+  for (int x = 0; x < command.toInt(); x++){
+    increaseVolume("");
+    delay(100);
+  }
   return 1;
 }
 
