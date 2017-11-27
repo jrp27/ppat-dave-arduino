@@ -2,6 +2,7 @@
 #include <aREST.h>
 #include <SendIR.h>
 #include "Gsender.h"
+#include <EEPROM.h>
 
 // Creates aREST instance
 aREST rest = aREST();
@@ -10,7 +11,7 @@ aREST rest = aREST();
 SendIR sendIR = SendIR();
 
 // WiFi params
-const char* ssid = "StataEECS"; //"TBH";
+const char* ssid = "MIT"; //"TBH";
 const char* password = "";//"hope today and tomorrow";
 
 // The port to listen for incoming TCP conections
@@ -20,14 +21,18 @@ const char* password = "";//"hope today and tomorrow";
 WiFiServer server(LISTEN_PORT);
 
 // Email body
-const char* email = "!\n This is an automated message. Do Not Reply.";
+const char* email_body = "!\n This is an automated message. Do Not Reply.";
+//const char* update_email_body = "You are subscribed to receive emails from PPAT arduino!\n This is an automated message. Do Not Reply.";
 
+// Params
+const int max_email_size = 30;
 const int max_vol = 20;
 
 void setup() {
   Serial.begin(115200);
   delay(10);
 
+  EEPROM.begin(max_email_size);
   // Sets the API routes
 
   // Volume
@@ -42,6 +47,9 @@ void setup() {
 
   // Power
   rest.function("power", power);
+
+  // Update Email
+  rest.function("email", updateEmail);
 
   // Connect to WiFi network
   Serial.println();
@@ -69,16 +77,17 @@ void setup() {
 
   Gsender *gsender = Gsender::Instance();
   String subject = "New Connection";
-  if(gsender->Subject(subject)->Send("kevinaer.mit@gmail.com", WiFi.localIP().toString()+email)) {
+  if(gsender->Subject(subject)->Send(getEmail(), WiFi.localIP().toString()+email_body)) {
         Serial.println("IP sent.");
-    } else {
-        Serial.print("Error sending message: ");
-        Serial.println(gsender->getError());
-    }
+  } else {
+      Serial.print("Error sending message: ");
+      Serial.println(gsender->getError());
+  }
 
 }
 
 void loop() {
+
   // Handle REST calls
   WiFiClient client = server.available();
   
@@ -214,5 +223,42 @@ int power(String command) {
     delay(100);
   }
   return 1;
+}
+
+String getEmail() {
+  String data = "";
+  for (int i = 0; i < max_email_size; i++){
+    char value = char(EEPROM.read(i));
+    if (int(value) == 0) {
+      break;
+    } else {
+      data += value;
+    }
+    delay(500);
+  }
+  Serial.println(data);
+  return data;
+}
+
+int updateEmail(String command) {
+  clearEmail();
+  for (int i = 0; i < command.length(); i++){
+    byte val = command[i];
+    EEPROM.write(i, val);
+
+    Serial.println("Writing");
+    Serial.println(command[i]);
+    delay(100);
+  }
+  EEPROM.commit();
+  return 1;
+}
+
+void clearEmail() {
+  for (int i = 0; i < max_email_size; i++)
+    EEPROM.write(i, 0);
+
+  // turn the LED on when we're done
+  EEPROM.commit();
 }
 
