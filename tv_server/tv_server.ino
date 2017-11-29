@@ -26,13 +26,14 @@ const char* email_body = "!\n This is an automated message. Do Not Reply.";
 
 // Params
 const int max_email_size = 30;
+const int max_ip_size = 15;
 const int max_vol = 20;
 
 void setup() {
   Serial.begin(115200);
   delay(10);
 
-  EEPROM.begin(max_email_size);
+  EEPROM.begin(max_email_size+max_ip_size);
   // Sets the API routes
 
   // Volume
@@ -75,15 +76,14 @@ void setup() {
   Serial.print(WiFi.localIP());
   Serial.println("/");
 
-  Gsender *gsender = Gsender::Instance();
-  String subject = "New Connection";
-  if(gsender->Subject(subject)->Send(getEmail(), WiFi.localIP().toString()+email_body)) {
-        Serial.println("IP sent.");
+  String oldIp = getIpAddress();
+  if (WiFi.localIP().toString() != oldIp){
+    Serial.println("IP needs to be updated");
+    updateIpAddress(WiFi.localIP().toString());
+    sendEmail("IP Address Updated",WiFi.localIP().toString()+email_body);
   } else {
-      Serial.print("Error sending message: ");
-      Serial.println(gsender->getError());
-  }
-
+    Serial.println("IP address is the most recent");
+  } 
 }
 
 void loop() {
@@ -225,6 +225,36 @@ int power(String command) {
   return 1;
 }
 
+String getIpAddress() {
+  String data = "";
+  for (int i = max_email_size; i < max_email_size + max_ip_size; i++){
+    char value = char(EEPROM.read(i));
+    if (int(value) == 0) {
+      break;
+    } else {
+      data += value;
+    }
+    delay(250);
+  }
+  return data;
+}
+
+void updateIpAddress(String ip) {
+  clearIpAddress();
+  for (int i = 0; i < ip.length(); i++){
+    byte val = ip[i];
+    EEPROM.write(i+max_email_size, val);
+    delay(200);
+  }
+  EEPROM.commit();
+}
+
+void clearIpAddress(){
+  for (int i = max_email_size; i < max_email_size + max_ip_size; i++)
+    EEPROM.write(i, 0);
+  EEPROM.commit();
+}
+
 String getEmail() {
   String data = "";
   for (int i = 0; i < max_email_size; i++){
@@ -234,31 +264,43 @@ String getEmail() {
     } else {
       data += value;
     }
-    delay(500);
+    delay(250);
   }
-  Serial.println(data);
   return data;
 }
 
 int updateEmail(String command) {
-  clearEmail();
-  for (int i = 0; i < command.length(); i++){
-    byte val = command[i];
-    EEPROM.write(i, val);
-
-    Serial.println("Writing");
-    Serial.println(command[i]);
-    delay(100);
+  String body = "You will now receive messages everytime IP address changes."+String(email_body);
+  if (sendEmail("Subscribed to TV IP Tracker", body)) {
+    clearEmail();
+    for (int i = 0; i < command.length(); i++){
+      byte val = command[i];
+      EEPROM.write(i, val);
+      delay(100);
+    }
+    EEPROM.commit();
+  } else {
+    body = "Invalid email "+command+ ". Please input a valid email." + email_body;
+    sendEmail("Email Update Failed", body);
   }
-  EEPROM.commit();
   return 1;
 }
 
 void clearEmail() {
   for (int i = 0; i < max_email_size; i++)
     EEPROM.write(i, 0);
-
-  // turn the LED on when we're done
   EEPROM.commit();
+}
+
+bool sendEmail(String subject, String body) {
+  Gsender *gsender = Gsender::Instance();
+  if(gsender->Subject(subject)->Send(getEmail(), body)) {
+        Serial.println("Email successfully sent.");
+        return true;
+  } else {
+      Serial.print("Error sending message: ");
+      Serial.println(gsender->getError());
+      return false;
+  }
 }
 
