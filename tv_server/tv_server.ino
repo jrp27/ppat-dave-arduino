@@ -19,6 +19,7 @@
 // WiFi params
 const char* ssid = "MIT";
 const char* password = "";
+
 // Volume params
 const int max_vol = 20;                           
 
