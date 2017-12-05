@@ -11,8 +11,8 @@ aREST rest = aREST();
 SendIR sendIR = SendIR();
 
 // WiFi params
-const char* ssid = "MIT"; //"TBH";
-const char* password = "";//"hope today and tomorrow";
+const char* ssid = "TBH";
+const char* password = "hope today and tomorrow";
 
 // The port to listen for incoming TCP conections
 #define LISTEN_PORT 80
