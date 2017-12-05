@@ -3,16 +3,33 @@
 #include <SendIR.h>
 #include "Gsender.h"
 #include <EEPROM.h>
+/*
+ Creates a server to communicate with a television using IR signals.
+
+ API Documentation for default instance of server can be found below:
+ https://github.com/jrp27/ppat-dave-arduino/wiki/Default-API-Routes
+ 
+ To use, only edit the User params listed below. Any other parts of the 
+ code should be edited at the user's discretion.
+*/
+
+
+/////////////////// START OF USER PARAMS ////////////////////////
+
+// WiFi params
+const char* ssid = "MIT";
+const char* password = "";
+
+// Volume params
+const int max_vol = 20;                           
+
+/////////////////// END OF USER PARAMS ////////////////////////
 
 // Creates aREST instance
 aREST rest = aREST();
 
 // Creates SendIR instance
 SendIR sendIR = SendIR();
-
-// WiFi params
-const char* ssid = "TBH";
-const char* password = "hope today and tomorrow";
 
 // The port to listen for incoming TCP conections
 #define LISTEN_PORT 80
@@ -22,12 +39,10 @@ WiFiServer server(LISTEN_PORT);
 
 // Email body
 const char* email_body = "!\n This is an automated message. Do Not Reply.";
-//const char* update_email_body = "You are subscribed to receive emails from PPAT arduino!\n This is an automated message. Do Not Reply.";
 
-// Params
+// Email Params
 const int max_email_size = 30;
 const int max_ip_size = 15;
-const int max_vol = 20;
 
 void setup() {
   Serial.begin(115200);
@@ -76,6 +91,7 @@ void setup() {
   Serial.print(WiFi.localIP());
   Serial.println("/");
 
+  // Sends email if IP address is different from the stored IP address
   String oldIp = getIpAddress();
   if (WiFi.localIP().toString() != oldIp){
     Serial.println("IP needs to be updated");
@@ -87,7 +103,6 @@ void setup() {
 }
 
 void loop() {
-
   // Handle REST calls
   WiFiClient client = server.available();
   
@@ -104,11 +119,8 @@ void error(char* err) {
   Serial.println(err);
 }
 
-// Sets volume
+// Sets volume given comma separated initial volume and a final volume
 int setVolume(String command) {
-
-  Serial.println("Setting volume");
-  Serial.println(command);
   int index_bracket_1 = command.indexOf("[");
   int index_bracket_2 = command.indexOf("]");
   int index_comma = command.indexOf(",");
@@ -125,21 +137,18 @@ int setVolume(String command) {
   }
   return 1;
 }
+
 // Increases volume
 int increaseVolume(String command){
-
   // TALK TO TV
-  Serial.println("Increase volume");
   sendIR.sendVolumeUp();
   return 1;
 }
 
 // Decreases volume
 int decreaseVolume(String command){
-
   // TALK TO TV
   sendIR.sendVolumeDown();
-  Serial.println("Decrease volume");
   return 1;
 }
 
@@ -147,7 +156,6 @@ int decreaseVolume(String command){
 int setChannel(String command) {
   // TALK TO TV
   for (int x = 0; x < command.length(); x++){
-    Serial.println(command[x]);
     switch(command[x]) {
       case '0':
         sendIR.send0();
@@ -187,31 +195,24 @@ int setChannel(String command) {
   return 1;
 }
 
-// Scrolls up in channel
+// Increases channel
 int increaseChannel(String command) {
-
   // TALK TO TV
   sendIR.sendChannelUp();
-  Serial.println("Increase channel");
   return 1;
 }
 
-// Scrolls down in channel
+// Decreases channel
 int decreaseChannel(String command) {
-
   // TALK TO TV
   sendIR.sendChannelDown();
-  Serial.println("Decrease channel");
   return 1;
 }
 
-// Powers button for TV
+// Power button for TV. Also resets volume to level it should be at.
 int power(String command) {
-
   // TALK TO TV
-  Serial.println("I am a power button look at me powering");
   sendIR.sendPower();
-
   delay(500);
   
   for (int x = 0; x < max_vol; x++){
@@ -225,6 +226,7 @@ int power(String command) {
   return 1;
 }
 
+// Obtains IP Address stored in memory
 String getIpAddress() {
   String data = "";
   for (int i = max_email_size; i < max_email_size + max_ip_size; i++){
@@ -239,6 +241,7 @@ String getIpAddress() {
   return data;
 }
 
+// Updates IP Address stored in memory
 void updateIpAddress(String ip) {
   clearIpAddress();
   for (int i = 0; i < ip.length(); i++){
@@ -249,12 +252,14 @@ void updateIpAddress(String ip) {
   EEPROM.commit();
 }
 
+// Clears the IP Address stored in memory
 void clearIpAddress(){
   for (int i = max_email_size; i < max_email_size + max_ip_size; i++)
     EEPROM.write(i, 0);
   EEPROM.commit();
 }
 
+// Obtains email stored in memory
 String getEmail() {
   String data = "";
   for (int i = 0; i < max_email_size; i++){
@@ -269,6 +274,7 @@ String getEmail() {
   return data;
 }
 
+// Updates email stored in memory
 int updateEmail(String command) {
   String body = "You will now receive messages everytime IP address changes."+String(email_body);
   if (sendEmail("Subscribed to TV IP Tracker", body)) {
@@ -286,6 +292,7 @@ int updateEmail(String command) {
   return 1;
 }
 
+// Clears email stored in memory
 void clearEmail() {
   for (int i = 0; i < max_email_size; i++)
     EEPROM.write(i, 0);
